@@ -27,6 +27,7 @@ const navItems = [
   { href: '/dashboard/maintenance', icon: CalendarClock, label: 'Maintenance' },
   { href: '/dashboard/costs', icon: DollarSign, label: 'Cost Tracking' },
   { href: '/dashboard/knowledge', icon: BookOpen, label: 'Knowledge Base' },
+  { href: '/dashboard/ai-ops', icon: Bot, label: 'AI Operations' },
   { href: '/dashboard/chief-of-staff', icon: Brain, label: 'Chief of Staff AI' },
   { href: '/dashboard/terminal', icon: Terminal, label: 'SSH Terminal' },
   { href: '/dashboard/settings', icon: Settings, label: 'Settings' },

@@ -24,6 +24,7 @@ const labelMap: Record<string, string> = {
   costs: 'Cost Tracking',
   knowledge: 'Knowledge Base',
   'chief-of-staff': 'Chief of Staff AI',
+  'ai-ops': 'AI Operations',
 }
 
 export function Breadcrumbs() {

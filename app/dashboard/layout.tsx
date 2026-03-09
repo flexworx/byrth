@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AuthContext, useAuthProvider } from '@/hooks/useAuth'
 import { ThemeContext, useThemeProvider } from '@/hooks/useTheme'
 import { DashboardSidebar } from '@/components/dashboard/layout/DashboardSidebar'
@@ -19,6 +19,18 @@ export default function DashboardLayout({
   const auth = useAuthProvider()
   const themeState = useThemeProvider()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Wait for client hydration before rendering auth-dependent UI
+  useEffect(() => setMounted(true), [])
+
+  if (!mounted) {
+    return (
+      <div className="flex min-h-screen bg-nexgen-bg items-center justify-center">
+        <div className="animate-pulse text-nexgen-muted text-sm font-mono">Loading platform...</div>
+      </div>
+    )
+  }
 
   return (
     <AuthContext.Provider value={auth}>
