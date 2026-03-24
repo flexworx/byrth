@@ -1,0 +1,67 @@
+#cloud-config
+# Roosk Database VM (VM-DB-01)
+# PostgreSQL 16 with pgvector for AI embeddings
+
+hostname: roosk-db
+manage_etc_hosts: true
+fqdn: roosk-db.nexgen.local
+
+users:
+  - name: deploy
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${SSH_PUBLIC_KEY}
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - wget
+  - qemu-guest-agent
+  - ufw
+  - gnupg
+  - lsb-release
+
+runcmd:
+  # Add PostgreSQL 16 repo
+  - sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+  - wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+  - apt-get update
+
+  # Install PostgreSQL 16 + pgvector
+  - apt-get install -y postgresql-16 postgresql-client-16 postgresql-16-pgvector
+
+  # Configure PostgreSQL to listen on all interfaces
+  - |
+    sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" /etc/postgresql/16/main/postgresql.conf
+    sed -i "s/#wal_level = replica/wal_level = replica/" /etc/postgresql/16/main/postgresql.conf
+    sed -i "s/#max_wal_senders = 10/max_wal_senders = 5/" /etc/postgresql/16/main/postgresql.conf
+    echo "host all all 10.20.0.0/24 scram-sha-256" >> /etc/postgresql/16/main/pg_hba.conf
+    echo "host replication replicator 10.20.0.0/24 scram-sha-256" >> /etc/postgresql/16/main/pg_hba.conf
+
+  # Restart PostgreSQL to apply config
+  - systemctl restart postgresql
+
+  # Create database and user (password set by bootstrap script via env var)
+  - sudo -u postgres psql -c "CREATE USER nexgen WITH PASSWORD '${DB_PASSWORD:-changeme}';"
+  - sudo -u postgres psql -c "CREATE DATABASE nexgen_platform OWNER nexgen;"
+  - sudo -u postgres psql -d nexgen_platform -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+  # Create backup directory
+  - mkdir -p /var/backups/nexgen
+  - chown postgres:postgres /var/backups/nexgen
+
+  # Configure firewall
+  - ufw allow 22/tcp
+  - ufw allow 5432/tcp
+  - ufw --force enable
+
+  # Enable guest agent
+  - systemctl enable qemu-guest-agent
+  - systemctl start qemu-guest-agent
+
+final_message: "Roosk Database VM ready. PostgreSQL 16 with pgvector listening on port 5432."

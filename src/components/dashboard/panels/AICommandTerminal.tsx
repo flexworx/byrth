@@ -76,7 +76,7 @@ export function AICommandTerminal() {
   const [history, setHistory] = useState<TerminalEntry[]>([
     {
       type: 'info',
-      text: 'Byrth NexGen Platform v2.0 — AI Action Mode (28 actions)\nType commands to manage infrastructure. Actions execute automatically.\n7 specialized agents available — select one above.',
+      text: 'Roosk NexGen Platform v2.0 — AI Action Mode (28 actions)\nType commands to manage infrastructure. Actions execute automatically.\n7 specialized agents available — select one above.',
       timestamp: new Date().toISOString(),
     },
   ])

@@ -185,7 +185,7 @@ echo "[10/10] Setting up NexGen platform..."
 if [ ! -d "/opt/nexgen" ]; then
     mkdir -p /opt/nexgen
     echo "Platform directory created at /opt/nexgen"
-    echo "Clone the Byrth repo here after Gitea is set up"
+    echo "Clone the Roosk repo here after Gitea is set up"
 fi
 
 echo ""

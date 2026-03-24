@@ -59,44 +59,44 @@ AVAILABLE_ACTIONS = {
 }
 
 # System prompt injected into Bedrock requests when action execution is enabled
-ACTION_SYSTEM_PROMPT = """You are the AI assistant for the Byrth NexGen Server Orchestration Platform, running on a Dell PowerEdge R7625 with Proxmox VE 9.1.
+ACTION_SYSTEM_PROMPT = """You are the AI assistant for the Roosk NexGen Server Orchestration Platform, running on a Dell PowerEdge R7625 with Proxmox VE 9.1.
 
-You can execute platform actions by including a JSON action block in your response. When the user's request maps to a platform capability, include EXACTLY ONE action block wrapped in ```byrth_action``` markers.
+You can execute platform actions by including a JSON action block in your response. When the user's request maps to a platform capability, include EXACTLY ONE action block wrapped in ```roosk_action``` markers.
 
 Available actions:
 {actions}
 
 Action block format:
-```byrth_action
+```roosk_action
 {{"action": "<action_name>", "params": {{<parameters>}}}}
 ```
 
 Examples:
-- "List all VMs" → ```byrth_action
+- "List all VMs" → ```roosk_action
 {{"action": "vm.list", "params": {{}}}}
 ```
-- "Start VM 104" → ```byrth_action
+- "Start VM 104" → ```roosk_action
 {{"action": "vm.start", "params": {{"vmid": 104}}}}
 ```
-- "Deploy a WireGuard VPN" → ```byrth_action
+- "Deploy a WireGuard VPN" → ```roosk_action
 {{"action": "service.deploy", "params": {{"template_id": "wireguard-vpn"}}}}
 ```
-- "Deploy a Windows desktop with 8 cores" → ```byrth_action
+- "Deploy a Windows desktop with 8 cores" → ```roosk_action
 {{"action": "service.deploy", "params": {{"template_id": "windows-desktop", "overrides": {{"cores": 8}}}}}}
 ```
-- "Clone VM 104 as my-clone" → ```byrth_action
+- "Clone VM 104 as my-clone" → ```roosk_action
 {{"action": "vm.clone", "params": {{"vmid": 104, "name": "my-clone"}}}}
 ```
-- "Show me all containers" → ```byrth_action
+- "Show me all containers" → ```roosk_action
 {{"action": "container.list", "params": {{}}}}
 ```
-- "What's the database status?" → ```byrth_action
+- "What's the database status?" → ```roosk_action
 {{"action": "db.status", "params": {{}}}}
 ```
-- "Show security alerts" → ```byrth_action
+- "Show security alerts" → ```roosk_action
 {{"action": "log.security", "params": {{}}}}
 ```
-- "Show audit logs" → ```byrth_action
+- "Show audit logs" → ```roosk_action
 {{"action": "log.audit", "params": {{"limit": 20}}}}
 ```
 
@@ -114,7 +114,7 @@ Rules:
 
 # Regex to extract action block from LLM response
 _ACTION_BLOCK_RE = re.compile(
-    r"```byrth_action\s*\n?(.*?)\n?```",
+    r"```roosk_action\s*\n?(.*?)\n?```",
     re.DOTALL,
 )
 
@@ -129,7 +129,7 @@ def build_action_system_prompt(knowledge_context: str = "") -> str:
 
 
 def parse_action_block(response_text: str) -> dict | None:
-    """Extract and parse a byrth_action JSON block from LLM response text.
+    """Extract and parse a roosk_action JSON block from LLM response text.
 
     Returns None if no action block found, or the parsed dict.
     """

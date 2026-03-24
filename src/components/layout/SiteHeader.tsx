@@ -26,10 +26,10 @@ export function SiteHeader() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-nexgen-accent to-nexgen-blue flex items-center justify-center glow-accent group-hover:animate-glow-pulse transition-all">
-                <span className="text-white font-bold text-base font-mono">B</span>
+                <span className="text-white font-bold text-base font-mono">R</span>
               </div>
               <div>
-                <span className="text-sm font-bold text-nexgen-text tracking-wide">BYRTH</span>
+                <span className="text-sm font-bold text-nexgen-text tracking-wide">ROOSK</span>
                 <span className="hidden sm:block text-[9px] text-nexgen-muted tracking-[0.25em] uppercase">
                   Network Intelligence
                 </span>

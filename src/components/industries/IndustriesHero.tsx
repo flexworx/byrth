@@ -25,7 +25,7 @@ export function IndustriesHero() {
           </h1>
           <p className="body-lg max-w-xl mx-auto">
             Compliance, uptime, and security requirements vary by industry.
-            Byrth adapts its AI intelligence to meet the specific demands
+            Roosk adapts its AI intelligence to meet the specific demands
             of your sector.
           </p>
         </motion.div>

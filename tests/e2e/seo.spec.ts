@@ -5,7 +5,7 @@ test.describe('SEO & Meta', () => {
     await page.goto('/')
     const desc = await page.locator('meta[name="description"]').getAttribute('content')
     expect(desc).toBeTruthy()
-    expect(desc).toContain('Byrth')
+    expect(desc).toContain('Roosk')
   })
 
   test('robots.txt is accessible', async ({ page }) => {
@@ -20,7 +20,7 @@ test.describe('SEO & Meta', () => {
     const res = await page.goto('/sitemap.xml')
     expect(res?.status()).toBe(200)
     const text = await res?.text()
-    expect(text).toContain('byrth.net')
+    expect(text).toContain('roosk.ai')
   })
 
   test('JSON-LD structured data is present', async ({ page }) => {
@@ -29,7 +29,7 @@ test.describe('SEO & Meta', () => {
     expect(jsonLd).toBeTruthy()
     const data = JSON.parse(jsonLd!)
     expect(data['@type']).toBe('Organization')
-    expect(data.name).toBe('Byrth')
+    expect(data.name).toBe('Roosk')
   })
 
   test('OG image endpoint responds', async ({ page }) => {

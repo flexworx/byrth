@@ -1,5 +1,5 @@
 #cloud-config
-# code-server (VS Code in Browser) — Byrth NexGen Platform
+# code-server (VS Code in Browser) — Roosk NexGen Platform
 # Deploys code-server with pre-configured extensions and Claude Code CLI
 
 hostname: code-server

@@ -2,12 +2,21 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Bell, User, LogOut, Menu, Check, X, Sun, Moon } from 'lucide-react'
+import { Bell, User, LogOut, Menu, Check, X, Sun, Moon, Wifi, WifiOff, RefreshCw } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { useNotifications } from '@/hooks/useNotifications'
+import { getConnectionState, onConnectionChange } from '@/services/api'
 import { motion, AnimatePresence } from 'framer-motion'
 import { clsx } from 'clsx'
+
+type ConnectionState = 'connected' | 'disconnected' | 'reconnecting'
+
+function useConnectionStatus() {
+  const [state, setState] = useState<ConnectionState>(getConnectionState)
+  useEffect(() => onConnectionChange(setState), [])
+  return state
+}
 
 interface HeaderProps {
   title: string
@@ -17,9 +26,14 @@ interface HeaderProps {
 export function DashboardHeader({ title, onMenuToggle }: HeaderProps) {
   const { user, token, logout } = useAuth()
   const { theme, toggle: toggleTheme } = useTheme()
-  const { notifications, unreadCount, connect, markRead, markAllRead, dismiss } = useNotifications()
+  const { notifications, unreadCount, connected: wsConnected, connect, reconnect, markRead, markAllRead, dismiss } = useNotifications()
+  const apiStatus = useConnectionStatus()
   const [bellOpen, setBellOpen] = useState(false)
   const bellRef = useRef<HTMLDivElement>(null)
+
+  // Overall connection: both API and WebSocket must be healthy
+  const isConnected = apiStatus === 'connected' && wsConnected
+  const isReconnecting = apiStatus === 'reconnecting'
 
   // Connect WebSocket on mount
   useEffect(() => {
@@ -53,10 +67,31 @@ export function DashboardHeader({ title, onMenuToggle }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-2 lg:gap-4">
-        {/* Status indicator */}
-        <div className="hidden sm:flex items-center gap-2 text-xs text-nexgen-muted">
-          <span className="w-2 h-2 rounded-full bg-nexgen-green animate-pulse" />
-          <span className="font-mono">Bedrock Only</span>
+        {/* Connection status + reconnect */}
+        <div className="hidden sm:flex items-center gap-1.5 text-xs">
+          {isConnected ? (
+            <div className="flex items-center gap-1.5 text-nexgen-green">
+              <Wifi size={14} />
+              <span className="font-mono">Connected</span>
+            </div>
+          ) : isReconnecting ? (
+            <div className="flex items-center gap-1.5 text-nexgen-amber">
+              <RefreshCw size={14} className="animate-spin" />
+              <span className="font-mono">Reconnecting…</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 text-nexgen-red">
+              <WifiOff size={14} />
+              <span className="font-mono">Disconnected</span>
+              <button
+                onClick={() => { reconnect(); window.location.reload() }}
+                className="ml-1 px-2 py-0.5 rounded bg-nexgen-red/20 hover:bg-nexgen-red/30 text-nexgen-red text-[10px] font-semibold transition-colors flex items-center gap-1"
+              >
+                <RefreshCw size={10} />
+                Reconnect
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Theme toggle */}

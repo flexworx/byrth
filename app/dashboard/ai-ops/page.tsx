@@ -103,7 +103,7 @@ export default function AIOpsConsolePage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'system',
-      content: `Welcome to the Byrth AI Operations Console. I'm your AI-powered infrastructure assistant with 28 executable actions.
+      content: `Welcome to the Roosk AI Operations Console. I'm your AI-powered infrastructure assistant with 28 executable actions.
 
 I can help you:
 - **Create, manage, and monitor VMs** — spin up servers, resize resources, take snapshots
@@ -272,7 +272,7 @@ Just tell me what you want to build or manage in plain English.`,
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-            placeholder="Tell Byrth what to build, deploy, or manage..."
+            placeholder="Tell Roosk what to build, deploy, or manage..."
             className="w-full bg-nexgen-surface border border-nexgen-border/40 rounded-xl px-4 py-3 text-sm text-nexgen-text placeholder-nexgen-muted/50 focus:outline-none focus:border-nexgen-accent/50 transition-colors pr-10"
             disabled={loading}
           />

@@ -77,7 +77,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
           >
-            Byrth replaces reactive managed services with AI-driven infrastructure
+            Roosk replaces reactive managed services with AI-driven infrastructure
             intelligence. Predictive analytics, automated incident response, and
             enterprise-grade security — operating autonomously on your behalf.
           </motion.p>

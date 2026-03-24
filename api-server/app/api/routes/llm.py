@@ -1,6 +1,6 @@
 """LLM Proxy endpoints — Bedrock-only with action execution and live context.
 
-Supports action-aware mode: when the LLM response contains a byrth_action block,
+Supports action-aware mode: when the LLM response contains a roosk_action block,
 the action is executed automatically and the result is included in the response.
 Injects live platform state and domain knowledge into every request.
 """
@@ -46,7 +46,7 @@ async def llm_complete(
     - VM hostnames → [VM-NAME]
     - Internal paths → stripped
 
-    Action execution: if the LLM response contains a byrth_action block,
+    Action execution: if the LLM response contains a roosk_action block,
     the action is executed and the result is appended to the response.
     """
     # Build live context for the AI

@@ -5,7 +5,7 @@ export const runtime = 'edge'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl
-  const title = searchParams.get('title') || 'Byrth'
+  const title = searchParams.get('title') || 'Roosk'
   const subtitle =
     searchParams.get('subtitle') || 'AI-First Managed Network Intelligence'
 
@@ -111,7 +111,7 @@ export async function GET(req: NextRequest) {
           }}
         >
           <span style={{ color: '#475569', fontSize: '16px', letterSpacing: '0.15em' }}>
-            BYRTH.NET
+            ROOSK.NET
           </span>
           <span style={{ color: '#334155', fontSize: '16px' }}>|</span>
           <span style={{ color: '#475569', fontSize: '14px' }}>

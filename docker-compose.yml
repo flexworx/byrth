@@ -15,7 +15,7 @@ services:
       - seccomp:unconfined
       - apparmor:unconfined
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://nexgen:nexgen_dev@host.docker.internal:5432/nexgen_platform}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://nexgen:nexgen_dev@10.20.0.20:5432/nexgen_platform}
       DEBUG: ${DEBUG:-false}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev-secret-key-change-in-production}
       CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:3000","https://roosk.ai"]}

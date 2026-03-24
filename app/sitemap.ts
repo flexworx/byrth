@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-const BASE_URL = 'https://byrth.net'
+const BASE_URL = 'https://roosk.ai'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = [

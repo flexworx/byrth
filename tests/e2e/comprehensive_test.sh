@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# Byrth NexGen Platform — Comprehensive Test Suite v2.1
+# Roosk NexGen Platform — Comprehensive Test Suite v2.1
 # Tests: syntax, imports, structure, stubs, frontend build, schema alignment,
 #        user management, AI actions, knowledge base, agent types, LLM proxy,
 #        service deployments, Proxmox version alignment, SSH terminal
@@ -22,7 +22,7 @@ FRONTEND="$ROOT/frontend"
 INFRA="$ROOT/infrastructure"
 
 echo "============================================="
-echo "  Byrth NexGen Platform — Comprehensive Test"
+echo "  Roosk NexGen Platform — Comprehensive Test"
 echo "  Suite v2.1 (Phases 1-6 + SSH Terminal)"
 echo "============================================="
 echo ""
@@ -98,11 +98,11 @@ REQUIRED_FILES=(
   "frontend/src/components/dashboard/NetworkMap.tsx"
   "frontend/src/components/dashboard/RecentActivity.tsx"
   # Infrastructure
-  "infrastructure/deploy/bootstrap-byrth.sh"
+  "infrastructure/deploy/bootstrap-roosk.sh"
   "infrastructure/deploy/01-proxmox-post-install.sh"
   "infrastructure/deploy/02-create-vms.sh"
-  "infrastructure/cloud-init/byrth-app.yml"
-  "infrastructure/cloud-init/byrth-db.yml"
+  "infrastructure/cloud-init/roosk-app.yml"
+  "infrastructure/cloud-init/roosk-db.yml"
   "infrastructure/cloud-init/wireguard.yml"
   "infrastructure/cloud-init/code-server.yml"
   "infrastructure/cloud-init/guacamole.yml"
@@ -357,17 +357,17 @@ echo ""
 # =============================================
 echo "--- Section 9: Infrastructure ---"
 
-BOOTSTRAP="$INFRA/deploy/bootstrap-byrth.sh"
+BOOTSTRAP="$INFRA/deploy/bootstrap-roosk.sh"
 if [ -f "$BOOTSTRAP" ]; then
   if head -1 "$BOOTSTRAP" | grep -q '#!/bin/bash'; then
-    green "bootstrap-byrth.sh has bash shebang"
+    green "bootstrap-roosk.sh has bash shebang"
   else
-    red "bootstrap-byrth.sh missing shebang"
+    red "bootstrap-roosk.sh missing shebang"
   fi
   if grep -q 'set -euo pipefail' "$BOOTSTRAP" 2>/dev/null; then
-    green "bootstrap-byrth.sh has strict error handling"
+    green "bootstrap-roosk.sh has strict error handling"
   else
-    yellow "bootstrap-byrth.sh missing strict mode"
+    yellow "bootstrap-roosk.sh missing strict mode"
   fi
 fi
 
@@ -405,7 +405,7 @@ echo ""
 echo "--- Section 10: Cloud-Init Templates ---"
 
 CLOUD_INIT_DIR="$INFRA/cloud-init"
-CI_FILES=("byrth-app.yml" "byrth-db.yml" "wireguard.yml" "code-server.yml" "guacamole.yml" "dev-environment.yml")
+CI_FILES=("roosk-app.yml" "roosk-db.yml" "wireguard.yml" "code-server.yml" "guacamole.yml" "dev-environment.yml")
 for ci in "${CI_FILES[@]}"; do
   if [ -f "$CLOUD_INIT_DIR/$ci" ]; then
     if head -1 "$CLOUD_INIT_DIR/$ci" | grep -q '#cloud-config'; then
@@ -644,7 +644,7 @@ else
 fi
 
 # Check knowledge sections
-KB_SECTIONS=("proxmox" "docker" "wireguard" "postgresql" "nginx" "systemd" "networking" "byrth_api" "guacamole" "windows_daas" "code_server")
+KB_SECTIONS=("proxmox" "docker" "wireguard" "postgresql" "nginx" "systemd" "networking" "roosk_api" "guacamole" "windows_daas" "code_server")
 for section in "${KB_SECTIONS[@]}"; do
   if grep -q "\"$section\"" "$KB_FILE" 2>/dev/null; then
     green "KB section: $section"
@@ -866,7 +866,7 @@ PVE_FILES=(
   "$FRONTEND/src/pages/Settings.tsx"
   "$INFRA/ansible/playbooks/01-proxmox-setup.yml"
   "$INFRA/deploy/01-proxmox-post-install.sh"
-  "$INFRA/deploy/bootstrap-byrth.sh"
+  "$INFRA/deploy/bootstrap-roosk.sh"
 )
 
 for f in "${PVE_FILES[@]}"; do
@@ -1138,6 +1138,6 @@ else
   echo -e "\033[32m  BUILD STATUS: ALL $TOTAL CHECKS PASSED\033[0m"
   echo ""
   echo "  Platform is ready for deployment."
-  echo "  Next: Boot Proxmox VE 9.1 from Ventoy → Run bootstrap-byrth.sh → Open dashboard"
+  echo "  Next: Boot Proxmox VE 9.1 from Ventoy → Run bootstrap-roosk.sh → Open dashboard"
   exit 0
 fi

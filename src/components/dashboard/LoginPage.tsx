@@ -57,9 +57,9 @@ export function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-nexgen-accent to-nexgen-blue glow-accent-strong mb-4">
-            <span className="text-white font-bold text-2xl font-mono">B</span>
+            <span className="text-white font-bold text-2xl font-mono">R</span>
           </div>
-          <h1 className="text-2xl font-bold text-nexgen-text tracking-wide">BYRTH</h1>
+          <h1 className="text-2xl font-bold text-nexgen-text tracking-wide">ROOSK</h1>
           <p className="text-xs text-nexgen-muted tracking-[0.3em] uppercase mt-1">
             NexGen Operations Center
           </p>

@@ -7,11 +7,22 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.models.models import VirtualMachine, ServiceDeployment
 from app.services.proxmox import proxmox_client
 from app.services.audit import log_action
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
+
+# VLAN-to-subnet mapping for cloud-init IP assignment via DHCP
+VLAN_SUBNETS = {
+    10: {"network": "192.168.4", "cidr": 24, "gateway": "192.168.4.1"},
+    20: {"network": "10.20.0", "cidr": 24, "gateway": "10.20.0.1"},
+    30: {"network": "10.30.0", "cidr": 24, "gateway": "10.30.0.1"},
+    40: {"network": "172.16.40", "cidr": 24, "gateway": "172.16.40.1"},
+    50: {"network": "10.50.0", "cidr": 24, "gateway": "10.50.0.1"},
+}
 
 
 TEMPLATES: dict[str, dict[str, Any]] = {
@@ -33,9 +44,9 @@ TEMPLATES: dict[str, dict[str, Any]] = {
             "bios": "ovmf",
             "machine": "q35",
             "ostype": "win11",
-            "tpmstate0": "local:1,version=v2.0",
             "cpu": "host",
         },
+        "virtio_iso": "virtio-win.iso",
         "post_install_notes": [
             "Attach Windows 11 ISO and VirtIO driver ISO via Proxmox console",
             "Boot the VM and complete Windows installation",
@@ -190,6 +201,84 @@ async def get_template(template_id: str) -> dict | None:
     return {"id": template_id, **template}
 
 
+async def _build_proxmox_params(
+    template: dict[str, Any],
+    vm_config: dict[str, Any],
+    vm_name: str,
+    next_vmid: int,
+    template_id: str,
+) -> dict[str, Any]:
+    """Build the full set of Proxmox API parameters for VM creation.
+
+    Includes disk, network, cloud-init, boot order — everything needed
+    for the VM to actually boot and be usable.
+    """
+    storage = settings.PROXMOX_STORAGE
+    iso_storage = settings.PROXMOX_ISO_STORAGE
+    bridge_prefix = settings.PROXMOX_BRIDGE_PREFIX
+    vlan = vm_config.get("vlan", 20)
+    disk_gb = vm_config.get("disk_gb", 50)
+    bridge = f"{bridge_prefix}{vlan}"
+
+    params: dict[str, Any] = {
+        "vmid": next_vmid,
+        "name": vm_name,
+        "cores": vm_config["cores"],
+        "memory": vm_config["ram_mb"],
+        "ostype": template.get("proxmox_overrides", {}).get("ostype", "l26"),
+        "tags": f"service;{template_id}",
+        "description": f"Service: {template['name']} — deployed via platform catalog",
+        "onboot": 1,
+        "agent": 1,
+        # SCSI controller
+        "scsihw": "virtio-scsi-single",
+        # Boot disk
+        "scsi0": f"{storage}:{disk_gb}",
+        # Network — virtio NIC on per-VLAN bridge (vmbr10, vmbr20, etc.)
+        "net0": f"virtio,bridge={bridge}",
+    }
+
+    is_windows = template.get("requires_iso") and "win" in vm_config.get("os_type", "")
+
+    if is_windows:
+        params["boot"] = "order=scsi0;net0"
+        # Apply Windows-specific overrides (BIOS, q35, cpu, etc.)
+        if "proxmox_overrides" in template:
+            params.update(template["proxmox_overrides"])
+        # UEFI requires EFI disk and TPM — use the same storage pool as VM disk
+        if params.get("bios") == "ovmf":
+            params["efidisk0"] = f"{storage}:1,efitype=4m,pre-enrolled-keys=1"
+            params["tpmstate0"] = f"{storage}:1,version=v2.0"
+        # Attach ISOs only if they exist on the storage — otherwise the user
+        # can attach them later via the Proxmox console
+        try:
+            available_isos = await proxmox_client.list_isos(iso_storage)
+        except Exception:
+            available_isos = []
+        iso_name = template.get("iso_name")
+        if iso_name and iso_name in available_isos:
+            params["ide2"] = f"{iso_storage}:iso/{iso_name},media=cdrom"
+            params["boot"] = f"order=ide2;scsi0;net0"
+        virtio_iso = template.get("virtio_iso")
+        if virtio_iso and virtio_iso in available_isos:
+            params["ide3"] = f"{iso_storage}:iso/{virtio_iso},media=cdrom"
+    else:
+        # Linux: attach Ubuntu ISO if available, configure cloud-init networking
+        ubuntu_iso = settings.PROXMOX_UBUNTU_ISO
+        try:
+            available_isos = await proxmox_client.list_isos(iso_storage)
+        except Exception:
+            available_isos = []
+        if ubuntu_iso in available_isos:
+            params["ide2"] = f"{iso_storage}:iso/{ubuntu_iso},media=cdrom"
+            params["boot"] = "order=scsi0;ide2;net0"
+        else:
+            params["boot"] = "order=scsi0;net0"
+        params["ipconfig0"] = "ip=dhcp"
+
+    return params
+
+
 async def deploy_service(
     template_id: str,
     overrides: dict,
@@ -198,45 +287,32 @@ async def deploy_service(
 ) -> dict:
     """Deploy a service from a template by creating a VM via Proxmox.
 
-    Args:
-        template_id: ID of the template to deploy
-        overrides: User overrides for VM config (cores, ram_mb, disk_gb, name)
-        db: Database session
-        user_id: ID of the user initiating the deployment
-
-    Returns:
-        Deployment result with VM details and status
+    Creates a fully-configured VM with disk, network, cloud-init, and boot
+    order so the VM is immediately bootable.
     """
     template = TEMPLATES.get(template_id)
     if not template:
         raise ValueError(f"Template '{template_id}' not found")
 
     vm_config = {**template["vm_config"]}
-    # Apply user overrides
     for key in ("cores", "ram_mb", "disk_gb", "vlan", "name"):
         if key in overrides:
             vm_config[key] = overrides[key]
 
-    # Generate a name if not provided
     vm_name = vm_config.pop("name", None) or f"SVC-{template['name'][:10].upper().replace(' ', '-')}-{uuid.uuid4().hex[:4]}"
 
     # Get next available VMID
     existing = await proxmox_client.list_vms()
     next_vmid = max((v["vmid"] for v in existing), default=199) + 1
 
-    # Create VM via Proxmox API
-    create_params = {
-        "vmid": next_vmid,
-        "name": vm_name,
-        "cores": vm_config["cores"],
-        "memory": vm_config["ram_mb"],
-        "ostype": "l26",
-        "tags": f"service;{template_id}",
-    }
-
-    # Apply Proxmox-specific overrides (BIOS, TPM for Windows, etc.)
-    if "proxmox_overrides" in template:
-        create_params.update(template["proxmox_overrides"])
+    # Build complete Proxmox params (disk, network, boot, cloud-init)
+    create_params = await _build_proxmox_params(
+        template=template,
+        vm_config=vm_config,
+        vm_name=vm_name,
+        next_vmid=next_vmid,
+        template_id=template_id,
+    )
 
     await proxmox_client.create_vm(**create_params)
 
@@ -305,12 +381,13 @@ async def deploy_service(
         "status": deploy_status,
         "vm_id": str(vm.id),
         "vmid": next_vmid,
-        "name": vm_name,
+        "vm_name": vm_name,
         "template_id": template_id,
         "template_name": template["name"],
         "requires_iso": template.get("requires_iso", False),
         "post_install_notes": template.get("post_install_notes", []),
         "access_info": {
-            "ip": f"Assigned via DHCP or cloud-init on VLAN {vm_config.get('vlan', 20)}",
+            "vlan": vm_config.get("vlan", 20),
+            "ip": "Assigned via DHCP on boot",
         },
     }

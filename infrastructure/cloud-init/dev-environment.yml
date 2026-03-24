@@ -1,5 +1,5 @@
 #cloud-config
-# Development Environment VM — Byrth NexGen Platform
+# Development Environment VM — Roosk NexGen Platform
 # Ubuntu VM with Docker, Git, Node.js, Python pre-installed
 
 hostname: dev-env
@@ -51,7 +51,7 @@ write_files:
     owner: deploy:deploy
     permissions: "0644"
     content: |
-      # Byrth Dev Environment aliases
+      # Roosk Dev Environment aliases
       alias ll='ls -alF'
       alias dc='docker compose'
       alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
@@ -59,7 +59,7 @@ write_files:
       alias gl='git log --oneline -20'
 
       # Node / Python version info on login
-      echo "--- Byrth Dev Environment ---"
+      echo "--- Roosk Dev Environment ---"
       echo "Node: $(node --version 2>/dev/null || echo 'not installed')"
       echo "Python: $(python3 --version 2>/dev/null || echo 'not installed')"
       echo "Docker: $(docker --version 2>/dev/null || echo 'not installed')"

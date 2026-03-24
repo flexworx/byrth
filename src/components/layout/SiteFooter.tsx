@@ -80,10 +80,10 @@ export function SiteFooter() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-nexgen-border/20">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-md bg-gradient-to-br from-nexgen-accent to-nexgen-blue flex items-center justify-center">
-              <span className="text-white font-bold text-xs font-mono">B</span>
+              <span className="text-white font-bold text-xs font-mono">R</span>
             </div>
             <span className="text-xs text-nexgen-muted">
-              &copy; {new Date().getFullYear()} Byrth. All rights reserved.
+              &copy; {new Date().getFullYear()} Roosk. All rights reserved.
             </span>
           </div>
           <div className="flex items-center gap-6">

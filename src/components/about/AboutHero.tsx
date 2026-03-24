@@ -16,7 +16,7 @@ export function AboutHero() {
           transition={{ duration: 0.6 }}
         >
           <span className="text-xs font-mono text-nexgen-accent uppercase tracking-[0.2em] mb-4 block">
-            About Byrth
+            About Roosk
           </span>
           <h1 className="heading-xl mb-6">
             We believe infrastructure
@@ -24,7 +24,7 @@ export function AboutHero() {
             <span className="gradient-text">should manage itself.</span>
           </h1>
           <p className="body-lg max-w-xl mx-auto">
-            Byrth was born from the conviction that enterprise infrastructure
+            Roosk was born from the conviction that enterprise infrastructure
             deserves better than reactive ticket queues and midnight pages.
             AI can do this work. We built the platform to prove it.
           </p>

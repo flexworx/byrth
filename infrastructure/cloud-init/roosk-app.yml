@@ -1,0 +1,61 @@
+#cloud-config
+# Roosk Platform Application VM (VM-APP-01)
+# Hosts the FastAPI backend + React frontend via Docker Compose
+
+hostname: roosk-app
+manage_etc_hosts: true
+fqdn: roosk-app.nexgen.local
+
+users:
+  - name: deploy
+    groups: sudo, docker
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${SSH_PUBLIC_KEY}
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - wget
+  - git
+  - qemu-guest-agent
+  - ufw
+  - jq
+  - ca-certificates
+  - gnupg
+  - lsb-release
+
+runcmd:
+  # Install Docker
+  - curl -fsSL https://get.docker.com | sh
+  - usermod -aG docker deploy
+
+  # Install Docker Compose plugin
+  - mkdir -p /usr/local/lib/docker/cli-plugins
+  - curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m)" -o /usr/local/lib/docker/cli-plugins/docker-compose
+  - chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+  # Install Nginx for reverse proxy
+  - apt-get install -y nginx
+  - systemctl enable nginx
+
+  # Create deployment directory
+  - mkdir -p /opt/roosk
+  - chown deploy:deploy /opt/roosk
+
+  # Configure firewall
+  - ufw allow 22/tcp
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw allow 8000/tcp
+  - ufw --force enable
+
+  # Enable guest agent
+  - systemctl enable qemu-guest-agent
+  - systemctl start qemu-guest-agent
+
+final_message: "Roosk Application VM ready. Deploy with: cd /opt/roosk && docker compose up -d"

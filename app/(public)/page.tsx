@@ -8,7 +8,7 @@ import { SocialProof } from '@/components/home/SocialProof'
 import { CTASection } from '@/components/home/CTASection'
 
 export const metadata: Metadata = {
-  title: 'Byrth | AI-First Managed Network Intelligence Platform',
+  title: 'Roosk | AI-First Managed Network Intelligence Platform',
 }
 
 export default function HomePage() {

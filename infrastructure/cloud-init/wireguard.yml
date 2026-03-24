@@ -1,5 +1,5 @@
 #cloud-config
-# WireGuard VPN Server — Byrth NexGen Platform
+# WireGuard VPN Server — Roosk NexGen Platform
 # Deploys a fully configured WireGuard VPN gateway
 
 hostname: wireguard-vpn
@@ -122,10 +122,10 @@ runcmd:
   - ufw --force enable
 
   # Generate first admin client config
-  - /usr/local/bin/wg-genclients.sh admin-byrth
+  - /usr/local/bin/wg-genclients.sh admin-roosk
 
   # Enable guest agent
   - systemctl enable qemu-guest-agent
   - systemctl start qemu-guest-agent
 
-final_message: "WireGuard VPN server ready. Admin client config at /etc/wireguard/clients/admin-byrth.conf"
+final_message: "WireGuard VPN server ready. Admin client config at /etc/wireguard/clients/admin-roosk.conf"

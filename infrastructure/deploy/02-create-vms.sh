@@ -8,7 +8,7 @@ set -euo pipefail
 echo "=== NexGen VM Provisioning ==="
 NODE="r7625"
 STORAGE="nexgen-vms"
-ISO_STORAGE="nexgen-iso"
+ISO_STORAGE="local"
 UBUNTU_ISO="ubuntu-22.04.iso"
 
 # Read API token
@@ -33,11 +33,19 @@ create_vm() {
 
     echo "  [CREATE] $NAME (VMID $VMID) — ${CORES}C/${RAM_MB}MB/${DISK_GB}GB VLAN${VLAN}"
 
+    # Determine bridge and VLAN tag
+    local BRIDGE="vmbr0"
+    local NET_OPTS="virtio,bridge=vmbr0"
+    if [ "$VLAN" -gt 0 ] 2>/dev/null; then
+        BRIDGE="vmbr${VLAN}"
+        NET_OPTS="virtio,bridge=${BRIDGE}"
+    fi
+
     qm create "$VMID" \
         --name "$NAME" \
         --cores "$CORES" \
         --memory "$RAM_MB" \
-        --net0 "virtio,bridge=vmbr0,tag=$VLAN" \
+        --net0 "$NET_OPTS" \
         --scsihw virtio-scsi-single \
         --scsi0 "${STORAGE}:${DISK_GB},format=raw" \
         --ide2 "${ISO_STORAGE}:iso/${UBUNTU_ISO},media=cdrom" \
@@ -60,15 +68,15 @@ echo ""
 
 # VMID  NAME           CORES  RAM     DISK  VLAN  IP                TAGS
 create_vm 100 "VM-FW-01"     2  4096    32   0    "dhcp"            "firewall;opnsense"
-create_vm 101 "VM-IAM-01"    4  8192   100  10    "192.168.4.20/24" "keycloak;iam"
-create_vm 102 "VM-SEC-01"    2  6144   100  10    "192.168.4.30/24" "vault;secrets"
-create_vm 103 "VM-SIEM-01"   4 10240   300  10    "192.168.4.40/24" "wazuh;siem"
+create_vm 101 "VM-IAM-01"    4  8192   100  10    "10.10.0.20/24" "keycloak;iam"
+create_vm 102 "VM-SEC-01"    2  6144   100  10    "10.10.0.30/24" "vault;secrets"
+create_vm 103 "VM-SIEM-01"   4 10240   300  10    "10.10.0.40/24" "wazuh;siem"
 create_vm 104 "VM-APP-01"    8 12288   200  20    "10.20.0.10/24"    "platform;api"
 create_vm 105 "VM-DB-01"     4 12288   500  20    "10.20.0.20/24"    "postgresql;primary"
 create_vm 106 "VM-DB-02"     4  8192   500  20    "10.20.0.21/24"    "postgresql;replica"
-create_vm 107 "VM-MON-01"    4  8192   200  10    "192.168.4.50/24" "prometheus;grafana"
+create_vm 107 "VM-MON-01"    4  8192   200  10    "10.10.0.50/24" "prometheus;grafana"
 create_vm 108 "VM-GIT-01"    2  6144   200  20    "10.20.0.30/24"    "gitea;git"
-create_vm 109 "VM-PROXY-01"  2  4096    50  40    "172.16.40.10/24"  "nginx;proxy"
+create_vm 109 "VM-PROXY-01"  2  4096    50  40    "10.40.0.10/24"  "nginx;proxy"
 
 echo ""
 echo "=== VM Provisioning Complete ==="

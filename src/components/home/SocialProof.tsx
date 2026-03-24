@@ -12,7 +12,7 @@ const stats = [
 const testimonials = [
   {
     quote:
-      'Byrth replaced our entire NOC team\'s overnight shift. Incidents that took 45 minutes now resolve in under 90 seconds — autonomously.',
+      'Roosk replaced our entire NOC team\'s overnight shift. Incidents that took 45 minutes now resolve in under 90 seconds — autonomously.',
     name: 'Director of IT Operations',
     org: 'Regional Healthcare System',
   },

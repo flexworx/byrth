@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-#  BYRTH.AI — EZ DEPLOY
+#  ROOSK.AI — EZ DEPLOY
 #  One script to rule them all.
 #
 #  Run this from your Proxmox shell after fresh install:
@@ -11,13 +11,13 @@
 #  What it does:
 #    Phase 1: Configure Proxmox (ZFS, VLANs, API token, security)
 #    Phase 2: Create the first VM (VM-APP-01) and deploy the platform
-#    Phase 3: You access https://byrth.ai from your browser
+#    Phase 3: You access https://roosk.ai from your browser
 #    Phase 4: Remaining VMs are created from the dashboard
 # =============================================================================
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG="/root/byrth-deploy.log"
+LOG="/root/roosk-deploy.log"
 
 # Colors
 RED='\033[0;31m'
@@ -26,14 +26,14 @@ CYAN='\033[0;36m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-log() { echo -e "${CYAN}[BYRTH]${NC} $1" | tee -a "$LOG"; }
+log() { echo -e "${CYAN}[ROOSK]${NC} $1" | tee -a "$LOG"; }
 ok()  { echo -e "${GREEN}  ✓${NC} $1" | tee -a "$LOG"; }
 warn(){ echo -e "${YELLOW}  ⚠${NC} $1" | tee -a "$LOG"; }
 err() { echo -e "${RED}  ✗${NC} $1" | tee -a "$LOG"; exit 1; }
 
 echo ""
 echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║         BYRTH.AI — NexGen Platform Deployer         ║${NC}"
+echo -e "${CYAN}║         ROOSK.AI — NexGen Platform Deployer         ║${NC}"
 echo -e "${CYAN}║         Dell PowerEdge R7625 · Proxmox VE           ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════╝${NC}"
 echo ""
@@ -221,7 +221,7 @@ echo -e "${CYAN}║  4. Run the platform deploy script:                  ║${NC
 echo -e "${CYAN}║       bash /root/deploy-platform.sh                  ║${NC}"
 echo -e "${CYAN}║  5. Access: http://10.20.0.10:3000                   ║${NC}"
 echo -e "${CYAN}║                                                      ║${NC}"
-echo -e "${CYAN}║  DNS: Point byrth.ai → server's public IP            ║${NC}"
+echo -e "${CYAN}║  DNS: Point roosk.ai → server's public IP            ║${NC}"
 echo -e "${CYAN}║  SSL: Run scripts/init-ssl.sh after DNS propagates   ║${NC}"
 echo -e "${CYAN}║                                                      ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════╝${NC}"
@@ -232,13 +232,13 @@ log "Generating deploy script for VM-APP-01..."
 cat > /root/deploy-platform.sh <<'DEPLOY_EOF'
 #!/bin/bash
 # =============================================================================
-# Byrth.ai Platform Deploy — Run this INSIDE VM-APP-01 after Ubuntu install
+# Roosk.ai Platform Deploy — Run this INSIDE VM-APP-01 after Ubuntu install
 # =============================================================================
 set -euo pipefail
 
-echo "=== Byrth.AI Platform Deployment ==="
+echo "=== Roosk.AI Platform Deployment ==="
 
-PLATFORM_DIR="/opt/byrth"
+PLATFORM_DIR="/opt/roosk"
 DB_PASS="$(openssl rand -hex 16)"
 JWT_SECRET="$(openssl rand -hex 32)"
 
@@ -257,10 +257,10 @@ apt-get install -y nodejs
 
 # 3. PostgreSQL
 echo "[3/8] Configuring PostgreSQL..."
-sudo -u postgres psql -c "CREATE USER byrth WITH PASSWORD '${DB_PASS}';" 2>/dev/null || true
-sudo -u postgres psql -c "CREATE DATABASE byrth_platform OWNER byrth;" 2>/dev/null || true
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE byrth_platform TO byrth;" 2>/dev/null || true
-echo "  ✓ Database: byrth_platform / user: byrth"
+sudo -u postgres psql -c "CREATE USER roosk WITH PASSWORD '${DB_PASS}';" 2>/dev/null || true
+sudo -u postgres psql -c "CREATE DATABASE roosk_platform OWNER roosk;" 2>/dev/null || true
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE roosk_platform TO roosk;" 2>/dev/null || true
+echo "  ✓ Database: roosk_platform / user: roosk"
 
 # 4. Clone repo
 echo "[4/8] Cloning repository..."
@@ -269,8 +269,8 @@ if [ -d "$PLATFORM_DIR/.git" ]; then
     cd "$PLATFORM_DIR" && git pull
 else
     # Try Gitea first, fallback to GitHub
-    git clone https://github.com/YOUR_USER/byrth.git "$PLATFORM_DIR" 2>/dev/null || \
-    git clone http://10.20.0.13:3000/admin/byrth.git "$PLATFORM_DIR" 2>/dev/null || \
+    git clone https://github.com/YOUR_USER/roosk.git "$PLATFORM_DIR" 2>/dev/null || \
+    git clone http://10.20.0.30:3000/admin/roosk.git "$PLATFORM_DIR" 2>/dev/null || \
     echo "  ⚠ Clone failed — copy files manually to $PLATFORM_DIR"
 fi
 cd "$PLATFORM_DIR"
@@ -284,10 +284,10 @@ pip install -r requirements.txt
 pip install email-validator bcrypt==4.2.1
 
 cat > .env <<ENV
-DATABASE_URL=postgresql+asyncpg://byrth:${DB_PASS}@localhost:5432/byrth_platform
+DATABASE_URL=postgresql+asyncpg://roosk:${DB_PASS}@localhost:5432/roosk_platform
 JWT_SECRET_KEY=${JWT_SECRET}
 DEBUG=false
-CORS_ORIGINS=["https://byrth.ai","http://localhost:3000"]
+CORS_ORIGINS=["https://roosk.ai","http://localhost:3000"]
 PROXMOX_URL=https://10.10.0.1:8006
 PROXMOX_TOKEN_ID=platform@pve!platform-token
 PROXMOX_TOKEN_SECRET=PASTE_TOKEN_HERE
@@ -304,9 +304,9 @@ npm run build
 # 7. Systemd services
 echo "[7/8] Creating systemd services..."
 
-cat > /etc/systemd/system/byrth-api.service <<SVC
+cat > /etc/systemd/system/roosk-api.service <<SVC
 [Unit]
-Description=Byrth.AI FastAPI Backend
+Description=Roosk.AI FastAPI Backend
 After=network.target postgresql.service
 
 [Service]
@@ -322,10 +322,10 @@ RestartSec=5
 WantedBy=multi-user.target
 SVC
 
-cat > /etc/systemd/system/byrth-web.service <<SVC
+cat > /etc/systemd/system/roosk-web.service <<SVC
 [Unit]
-Description=Byrth.AI Next.js Frontend
-After=network.target byrth-api.service
+Description=Roosk.AI Next.js Frontend
+After=network.target roosk-api.service
 
 [Service]
 Type=simple
@@ -342,16 +342,16 @@ WantedBy=multi-user.target
 SVC
 
 systemctl daemon-reload
-systemctl enable byrth-api byrth-web
-systemctl start byrth-api byrth-web
+systemctl enable roosk-api roosk-web
+systemctl start roosk-api roosk-web
 echo "  ✓ Services started"
 
 # 8. Nginx reverse proxy
 echo "[8/8] Configuring Nginx..."
-cat > /etc/nginx/sites-available/byrth <<'NGINX'
+cat > /etc/nginx/sites-available/roosk <<'NGINX'
 server {
     listen 80;
-    server_name byrth.ai www.byrth.ai _;
+    server_name roosk.ai www.roosk.ai _;
 
     # Frontend
     location / {
@@ -391,14 +391,14 @@ server {
 }
 NGINX
 
-ln -sf /etc/nginx/sites-available/byrth /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/roosk /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 nginx -t && systemctl reload nginx
 echo "  ✓ Nginx configured"
 
 echo ""
 echo "╔══════════════════════════════════════════════════════╗"
-echo "║          BYRTH.AI IS LIVE                            ║"
+echo "║          ROOSK.AI IS LIVE                            ║"
 echo "╠══════════════════════════════════════════════════════╣"
 echo "║                                                      ║"
 echo "║  Dashboard: http://$(hostname -I | awk '{print $1}')                    ║"
@@ -406,10 +406,10 @@ echo "║  API Docs:  http://$(hostname -I | awk '{print $1}')/docs             
 echo "║  Login:     admin@flexworx.io / nexgen2026           ║"
 echo "║                                                      ║"
 echo "║  For SSL:                                            ║"
-echo "║    certbot --nginx -d byrth.ai -d www.byrth.ai       ║"
+echo "║    certbot --nginx -d roosk.ai -d www.roosk.ai       ║"
 echo "║                                                      ║"
 echo "║  Services:                                           ║"
-echo "║    systemctl status byrth-api byrth-web               ║"
+echo "║    systemctl status roosk-api roosk-web               ║"
 echo "║                                                      ║"
 echo "╚══════════════════════════════════════════════════════╝"
 DEPLOY_EOF

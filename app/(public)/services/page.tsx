@@ -7,7 +7,7 @@ import { CTASection } from '@/components/home/CTASection'
 export const metadata: Metadata = {
   title: 'Services',
   description:
-    'Managed network services powered by AI. From infrastructure provisioning to security operations, Byrth delivers autonomous intelligence at enterprise scale.',
+    'Managed network services powered by AI. From infrastructure provisioning to security operations, Roosk delivers autonomous intelligence at enterprise scale.',
 }
 
 export default function ServicesPage() {

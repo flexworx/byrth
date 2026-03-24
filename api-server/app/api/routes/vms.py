@@ -8,12 +8,15 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.security import get_current_user, require_role
 from app.models.models import VirtualMachine
 from app.api.schemas.schemas import VMCreate, VMResponse, VMAction
 from app.services.proxmox import proxmox_client
 from app.services.audit import log_action
+
+settings = get_settings()
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +32,81 @@ class VMResizeRequest(BaseModel):
     size: str = Field(description="e.g. +10G or 100G")
 
 
+async def _sync_vms_from_proxmox(db: AsyncSession) -> dict:
+    """Import/update VMs from Proxmox into the local database."""
+    live_vms = await proxmox_client.list_vms()
+    created, updated = 0, 0
+
+    for pvm in live_vms:
+        vmid = pvm["vmid"]
+        result = await db.execute(
+            select(VirtualMachine).where(VirtualMachine.vmid == vmid)
+        )
+        existing = result.scalar_one_or_none()
+
+        status_raw = pvm.get("status", "unknown")
+        status = status_raw if status_raw in ("running", "stopped", "paused", "suspended") else "unknown"
+        tags_raw = pvm.get("tags", "")
+        tags = [t for t in tags_raw.split(";") if t] if tags_raw else []
+
+        # Extract IP and VLAN from Proxmox VM config
+        ip_address = None
+        vlan = None
+        try:
+            config = await proxmox_client.get_vm_config(vmid)
+            ipconfig0 = config.get("ipconfig0", "")
+            if "ip=" in ipconfig0:
+                ip_address = ipconfig0.split("ip=")[1].split("/")[0].split(",")[0]
+            net0 = config.get("net0", "")
+            if "vmbr" in net0:
+                bridge = net0.split("bridge=")[1].split(",")[0] if "bridge=" in net0 else ""
+                vlan_map = {"vmbr10": 10, "vmbr20": 20, "vmbr30": 30, "vmbr40": 40, "vmbr50": 50}
+                vlan = vlan_map.get(bridge)
+        except Exception:
+            pass
+
+        if existing:
+            existing.status = status
+            existing.name = pvm.get("name", existing.name)
+            existing.cpu_cores = pvm.get("cpus", existing.cpu_cores)
+            existing.ram_mb = pvm.get("maxmem", 0) // (1024 * 1024) or existing.ram_mb
+            existing.disk_gb = pvm.get("maxdisk", 0) // (1024 ** 3) or existing.disk_gb
+            existing.tags = tags or existing.tags
+            if ip_address:
+                existing.ip_address = ip_address
+            if vlan is not None:
+                existing.vlan = vlan
+            updated += 1
+        else:
+            vm = VirtualMachine(
+                vmid=vmid,
+                name=pvm.get("name", f"vm-{vmid}"),
+                status=status,
+                cpu_cores=pvm.get("cpus"),
+                ram_mb=pvm.get("maxmem", 0) // (1024 * 1024),
+                disk_gb=pvm.get("maxdisk", 0) // (1024 ** 3),
+                node="r7625",
+                tags=tags,
+                ip_address=ip_address,
+                vlan=vlan,
+            )
+            db.add(vm)
+            created += 1
+
+    await db.commit()
+    return {"created": created, "updated": updated, "total": len(live_vms)}
+
+
+@router.post("/sync")
+async def sync_vms(
+    db: AsyncSession = Depends(get_db),
+    user: dict = Depends(require_role("operator")),
+):
+    """Import/sync all VMs from Proxmox into the local database."""
+    result = await _sync_vms_from_proxmox(db)
+    return result
+
+
 @router.get("/", response_model=list[VMResponse])
 async def list_vms(
     db: AsyncSession = Depends(get_db),
@@ -37,6 +115,16 @@ async def list_vms(
     """List all virtual machines from database + live Proxmox status."""
     result = await db.execute(select(VirtualMachine).order_by(VirtualMachine.name))
     vms = list(result.scalars().all())
+
+    # Auto-seed on first request if DB is empty
+    if not vms:
+        try:
+            sync_result = await _sync_vms_from_proxmox(db)
+            logger.info(f"Auto-synced VMs from Proxmox: {sync_result}")
+            result = await db.execute(select(VirtualMachine).order_by(VirtualMachine.name))
+            vms = list(result.scalars().all())
+        except Exception as e:
+            logger.warning(f"Auto-sync failed: {e}")
 
     try:
         live_vms = await proxmox_client.list_vms()
@@ -82,14 +170,41 @@ async def create_vm(
     existing = await proxmox_client.list_vms()
     next_vmid = max((v["vmid"] for v in existing), default=99) + 1
 
-    await proxmox_client.create_vm(
-        vmid=next_vmid,
-        name=vm_data.name,
-        cores=vm_data.cpu_cores,
-        memory=vm_data.ram_mb,
-        ostype=vm_data.os_type,
-        tags=";".join(vm_data.tags) if vm_data.tags else "",
-    )
+    storage = settings.PROXMOX_STORAGE
+    bridge_prefix = settings.PROXMOX_BRIDGE_PREFIX
+    iso_storage = settings.PROXMOX_ISO_STORAGE
+    ubuntu_iso = settings.PROXMOX_UBUNTU_ISO
+    bridge = f"{bridge_prefix}{vm_data.vlan}"
+
+    is_windows = "win" in vm_data.os_type.lower()
+    ostype = "win11" if is_windows else "l26"
+
+    create_params: dict = {
+        "vmid": next_vmid,
+        "name": vm_data.name,
+        "cores": vm_data.cpu_cores,
+        "memory": vm_data.ram_mb,
+        "ostype": ostype,
+        "tags": ";".join(vm_data.tags) if vm_data.tags else "",
+        "onboot": 1,
+        "agent": 1,
+        "scsihw": "virtio-scsi-single",
+        "scsi0": f"{storage}:{vm_data.disk_gb}",
+        "net0": f"virtio,bridge={bridge}",
+        "description": f"Platform VM — {vm_data.name}",
+    }
+
+    if is_windows:
+        create_params["boot"] = "order=ide2;scsi0;net0"
+        create_params["bios"] = "ovmf"
+        create_params["machine"] = "q35"
+        create_params["cpu"] = "host"
+    else:
+        create_params["ide2"] = f"{iso_storage}:iso/{ubuntu_iso},media=cdrom"
+        create_params["boot"] = "order=scsi0;ide2;net0"
+        create_params["ipconfig0"] = "ip=dhcp"
+
+    await proxmox_client.create_vm(**create_params)
 
     vm = VirtualMachine(
         vmid=next_vmid,

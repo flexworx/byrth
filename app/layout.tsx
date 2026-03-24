@@ -16,11 +16,11 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Byrth | AI-First Managed Network Intelligence Platform',
-    template: '%s | Byrth',
+    default: 'Roosk | AI-First Managed Network Intelligence Platform',
+    template: '%s | Roosk',
   },
   description:
-    'Byrth delivers autonomous network intelligence powered by CentralIntel.ai. Enterprise-grade infrastructure management with AI-driven monitoring, predictive analytics, and automated incident response.',
+    'Roosk delivers autonomous network intelligence powered by CentralIntel.ai. Enterprise-grade infrastructure management with AI-driven monitoring, predictive analytics, and automated incident response.',
   keywords: [
     'managed network services',
     'AI infrastructure',
@@ -35,14 +35,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    siteName: 'Byrth',
-    title: 'Byrth | AI-First Managed Network Intelligence Platform',
+    siteName: 'Roosk',
+    title: 'Roosk | AI-First Managed Network Intelligence Platform',
     description:
       'Autonomous network intelligence powered by CentralIntel.ai. Enterprise infrastructure management reimagined.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Byrth | AI-First Network Intelligence',
+    title: 'Roosk | AI-First Network Intelligence',
     description:
       'Autonomous network intelligence powered by CentralIntel.ai.',
   },
@@ -59,6 +59,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`dark ${inter.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#06b6d4" />
+      </head>
       <body className="bg-nexgen-bg text-nexgen-text font-sans antialiased">
         <script
           type="application/ld+json"
@@ -66,8 +73,8 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Organization',
-              name: 'Byrth',
-              url: 'https://byrth.net',
+              name: 'Roosk',
+              url: 'https://roosk.ai',
               description:
                 'AI-First Managed Network Intelligence Platform powered by CentralIntel.ai',
               areaServed: 'US',

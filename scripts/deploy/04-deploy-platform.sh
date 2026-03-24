@@ -9,7 +9,7 @@ echo "=== NexGen Platform Deployment ==="
 echo "Target: VM-APP-01 (10.20.0.10)"
 
 PLATFORM_DIR="/opt/nexgen"
-REPO_URL="http://10.20.0.13:3000/admin/byrth.git"  # Gitea on VM-GIT-01
+REPO_URL="http://10.20.0.13:3000/admin/roosk.git"  # Gitea on VM-GIT-01
 
 # 1. System setup
 echo "[1/7] System setup..."

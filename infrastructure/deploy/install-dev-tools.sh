@@ -1,8 +1,8 @@
 #!/bin/bash
 # =============================================================================
-#  BYRTH.AI — Development Tools Installer
+#  ROOSK.AI — Development Tools Installer
 #  Run this on the Dell R7625 (or any Ubuntu 22.04+ server) to install
-#  all development tools needed for the Byrth platform.
+#  all development tools needed for the Roosk platform.
 #
 #  Usage: bash install-dev-tools.sh
 # =============================================================================
@@ -20,7 +20,7 @@ warn(){ echo -e "${YELLOW}  ⚠${NC} $1"; }
 
 echo ""
 echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║     BYRTH.AI — Development Tools Installer          ║${NC}"
+echo -e "${CYAN}║     ROOSK.AI — Development Tools Installer          ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════╝${NC}"
 echo ""
 
@@ -119,10 +119,10 @@ mkdir -p ~/.config/code-server
 cat > ~/.config/code-server/config.yaml <<'EOF'
 bind-addr: 0.0.0.0:8443
 auth: password
-password: byrth2026
+password: roosk2026
 cert: false
 EOF
-ok "code-server configured on port 8443 (password: byrth2026)"
+ok "code-server configured on port 8443 (password: roosk2026)"
 
 # Enable as service
 systemctl enable --now code-server@root > /dev/null 2>&1 || true
@@ -174,7 +174,7 @@ echo -e "${CYAN}║    • Playwright system deps                        ║${NC
 echo -e "${CYAN}║    • lazydocker (Docker TUI)                        ║${NC}"
 echo -e "${CYAN}║                                                      ║${NC}"
 echo -e "${CYAN}║  VS Code Server: http://SERVER_IP:8443              ║${NC}"
-echo -e "${CYAN}║    Password: byrth2026 (change in config)           ║${NC}"
+echo -e "${CYAN}║    Password: roosk2026 (change in config)           ║${NC}"
 echo -e "${CYAN}║                                                      ║${NC}"
 echo -e "${CYAN}║  VS Code Remote (from your PC):                     ║${NC}"
 echo -e "${CYAN}║    1. Install 'Remote - SSH' extension              ║${NC}"

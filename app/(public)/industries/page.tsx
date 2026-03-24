@@ -6,7 +6,7 @@ import { CTASection } from '@/components/home/CTASection'
 export const metadata: Metadata = {
   title: 'Industries',
   description:
-    'Byrth serves enterprises across healthcare, finance, energy, manufacturing, and government with AI-driven network intelligence tailored to vertical compliance needs.',
+    'Roosk serves enterprises across healthcare, finance, energy, manufacturing, and government with AI-driven network intelligence tailored to vertical compliance needs.',
 }
 
 export default function IndustriesPage() {

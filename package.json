@@ -1,8 +1,8 @@
 {
-  "name": "byrth-platform",
+  "name": "roosk-platform",
   "version": "2.0.0",
   "private": true,
-  "description": "Byrth AI-First Managed Network Intelligence Platform",
+  "description": "Roosk AI-First Managed Network Intelligence Platform",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

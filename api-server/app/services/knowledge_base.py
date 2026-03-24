@@ -1,8 +1,8 @@
-"""Comprehensive domain knowledge base for the Byrth NexGen Platform AI assistant.
+"""Comprehensive domain knowledge base for the Roosk NexGen Platform AI assistant.
 
 Covers all platforms, tools, and services running on the Dell PowerEdge R7625:
 Proxmox VE, Docker, WireGuard, PostgreSQL, Nginx, systemd, networking, Guacamole,
-Windows DaaS, code-server, and the Byrth platform API itself.
+Windows DaaS, code-server, and the Roosk platform API itself.
 
 Each section is independently selectable so the AI only gets relevant context
 per query (~2000 tokens max injected), keeping costs and latency down.
@@ -72,10 +72,10 @@ Commands:
 - docker network ls — list networks
 - docker volume ls — list volumes
 
-Byrth stack services (docker-compose.yml):
-- byrth-backend: FastAPI app on port 8000
-- byrth-frontend: React app served by Nginx on port 80/443
-- byrth-db: PostgreSQL 16 (or external VM-DB-01)
+Roosk stack services (docker-compose.yml):
+- roosk-backend: FastAPI app on port 8000
+- roosk-frontend: React app served by Nginx on port 80/443
+- roosk-db: PostgreSQL 16 (or external VM-DB-01)
 
 Troubleshooting:
 - Container won't start: docker logs <container>, check ports
@@ -168,14 +168,14 @@ Config files: /etc/postgresql/16/main/
         """## Nginx Reverse Proxy
 Runs on VM-APP-01 (10.20.0.10), proxies to backend on localhost:8000.
 
-Config: /etc/nginx/sites-available/byrth
-Enabled: /etc/nginx/sites-enabled/byrth
+Config: /etc/nginx/sites-available/roosk
+Enabled: /etc/nginx/sites-enabled/roosk
 
 Typical config:
 ```
 server {
     listen 80;
-    server_name byrth-app.nexgen.local;
+    server_name roosk-app.nexgen.local;
 
     location /api {
         proxy_pass http://localhost:8000;
@@ -185,14 +185,14 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
     location / {
-        root /opt/byrth/frontend/dist;
+        root /opt/roosk/frontend/dist;
         try_files $uri $uri/ /index.html;
     }
 }
 ```
 
 SSL/TLS with Let's Encrypt:
-- certbot --nginx -d byrth-app.nexgen.local
+- certbot --nginx -d roosk-app.nexgen.local
 - Auto-renewal: systemctl enable certbot.timer
 - Manual renewal: certbot renew --dry-run
 
@@ -261,7 +261,7 @@ VLAN Map:
 
 Key IP Assignments:
 - Proxmox host: 192.168.4.58 (management)
-- VM-APP-01: 10.20.0.10 (Byrth platform)
+- VM-APP-01: 10.20.0.10 (Roosk platform)
 - VM-DB-01: 10.20.0.20 (PostgreSQL primary)
 - VM-DB-02: 10.20.0.21 (PostgreSQL replica)
 - VPN server: 10.10.0.x / VPN clients: 10.100.0.0/24
@@ -282,11 +282,11 @@ Gateway: 10.20.0.1 (Proxmox host routes between VLANs)
 """,
     ),
     (
-        "byrth_api",
-        ["byrth", "api", "endpoint", "route", "auth", "jwt", "token", "login",
+        "roosk_api",
+        ["roosk", "api", "endpoint", "route", "auth", "jwt", "token", "login",
          "mfa", "totp", "curl", "rest", "fastapi", "backend", "frontend",
          "murph", "platform", "dashboard"],
-        """## Byrth Platform API Reference
+        """## Roosk Platform API Reference
 Base URL: http://10.20.0.10:8000/api (or via Nginx on port 80)
 Auth: JWT Bearer token (HS256), MFA via TOTP (pyotp)
 

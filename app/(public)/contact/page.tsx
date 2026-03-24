@@ -258,7 +258,7 @@ export default function ContactPage() {
                   </h3>
                   <div className="space-y-4">
                     {[
-                      { icon: Mail, label: 'Email', value: 'hello@byrth.net' },
+                      { icon: Mail, label: 'Email', value: 'hello@roosk.ai' },
                       { icon: Phone, label: 'Phone', value: '+1 (555) 000-0000' },
                       { icon: MapPin, label: 'Location', value: 'Dallas, TX' },
                       {

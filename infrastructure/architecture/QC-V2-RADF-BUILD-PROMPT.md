@@ -7,7 +7,7 @@ Copy and paste the following prompt to initiate the full engineering build:
 
 ## PROMPT: Quantum Communications v2 Engineering RADF Build
 
-You are building **Quantum Communications v2** with the **Digital Chief of Staff AI** layer for the Byrth NexGen Platform. The architecture spec is at `infrastructure/architecture/DIGITAL-CHIEF-OF-STAFF.md`. The existing codebase has:
+You are building **Quantum Communications v2** with the **Digital Chief of Staff AI** layer for the Roosk NexGen Platform. The architecture spec is at `infrastructure/architecture/DIGITAL-CHIEF-OF-STAFF.md`. The existing codebase has:
 
 - **Frontend:** Next.js 14 App Router in `app/` with Tailwind + Framer Motion
 - **Backend:** FastAPI in `api-server/` with 28 AI-executable actions, 7 agent types, LLM proxy (Bedrock + Ollama), knowledge base, webhook delivery, Proxmox integration

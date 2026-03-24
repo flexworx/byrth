@@ -49,6 +49,11 @@ class Settings(BaseSettings):
     PROXMOX_TOKEN_ID: str = "platform@pve!platform-token"
     PROXMOX_TOKEN_SECRET: str = ""
     PROXMOX_VERIFY_SSL: bool = False
+    PROXMOX_NODE: str = "r7625"
+    PROXMOX_STORAGE: str = "nexgen-vms"
+    PROXMOX_ISO_STORAGE: str = "local"
+    PROXMOX_BRIDGE_PREFIX: str = "vmbr"
+    PROXMOX_UBUNTU_ISO: str = "ubuntu-22.04.iso"
 
     # HashiCorp Vault
     VAULT_URL: str = "https://vm-sec-01.mgmt.local:8200"

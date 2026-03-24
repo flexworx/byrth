@@ -4,16 +4,16 @@ import { Check, X, Minus } from 'lucide-react'
 import { MotionSection, MotionDiv } from '@/components/ui/motion'
 
 const rows = [
-  { feature: 'AI-Driven Orchestration', byrth: true, legacy: false },
-  { feature: 'Natural Language Commands', byrth: true, legacy: false },
-  { feature: 'Automated Incident Response', byrth: true, legacy: 'partial' },
-  { feature: 'Predictive Analytics', byrth: true, legacy: false },
-  { feature: 'SOC 2 Type II Compliance', byrth: true, legacy: true },
-  { feature: 'NIST SP 800-53 Controls', byrth: true, legacy: 'partial' },
-  { feature: 'Zero Trust Architecture', byrth: true, legacy: 'partial' },
-  { feature: 'Immutable Audit Logs', byrth: true, legacy: false },
-  { feature: 'Sub-Second Alert Triage', byrth: true, legacy: false },
-  { feature: 'Self-Healing Infrastructure', byrth: true, legacy: false },
+  { feature: 'AI-Driven Orchestration', roosk: true, legacy: false },
+  { feature: 'Natural Language Commands', roosk: true, legacy: false },
+  { feature: 'Automated Incident Response', roosk: true, legacy: 'partial' },
+  { feature: 'Predictive Analytics', roosk: true, legacy: false },
+  { feature: 'SOC 2 Type II Compliance', roosk: true, legacy: true },
+  { feature: 'NIST SP 800-53 Controls', roosk: true, legacy: 'partial' },
+  { feature: 'Zero Trust Architecture', roosk: true, legacy: 'partial' },
+  { feature: 'Immutable Audit Logs', roosk: true, legacy: false },
+  { feature: 'Sub-Second Alert Triage', roosk: true, legacy: false },
+  { feature: 'Self-Healing Infrastructure', roosk: true, legacy: false },
 ]
 
 function StatusIcon({ status }: { status: boolean | string }) {
@@ -31,11 +31,11 @@ export function ServiceComparison() {
             Comparison
           </span>
           <h2 className="heading-lg mb-4">
-            Byrth vs. legacy MSPs.
+            Roosk vs. legacy MSPs.
           </h2>
           <p className="body-md max-w-xl mx-auto">
             Traditional managed service providers react to problems.
-            Byrth prevents them.
+            Roosk prevents them.
           </p>
         </MotionDiv>
 
@@ -47,7 +47,7 @@ export function ServiceComparison() {
                 Capability
               </div>
               <div className="text-xs font-semibold text-nexgen-accent uppercase tracking-wider text-center">
-                Byrth
+                Roosk
               </div>
               <div className="text-xs font-semibold text-nexgen-muted uppercase tracking-wider text-center">
                 Legacy MSP
@@ -64,7 +64,7 @@ export function ServiceComparison() {
               >
                 <div className="text-sm text-nexgen-text">{row.feature}</div>
                 <div className="flex justify-center">
-                  <StatusIcon status={row.byrth} />
+                  <StatusIcon status={row.roosk} />
                 </div>
                 <div className="flex justify-center">
                   <StatusIcon status={row.legacy} />

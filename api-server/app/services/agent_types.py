@@ -24,7 +24,7 @@ AGENT_TYPES: dict[str, dict[str, Any]] = {
         ],
         "knowledge_sections": [
             "proxmox", "docker", "wireguard", "postgresql", "nginx",
-            "systemd", "networking", "byrth_api", "guacamole", "windows_daas", "code_server",
+            "systemd", "networking", "roosk_api", "guacamole", "windows_daas", "code_server",
         ],
         "system_prompt_addon": "You are Murph, the general-purpose AI assistant. You have expertise across all platform domains. Help the user with any question or action.",
     },
@@ -52,7 +52,7 @@ AGENT_TYPES: dict[str, dict[str, Any]] = {
             "platform.health", "vm.list", "vm.status",
             "network.topology",
         ],
-        "knowledge_sections": ["networking", "byrth_api", "nginx"],
+        "knowledge_sections": ["networking", "roosk_api", "nginx"],
         "system_prompt_addon": "You are the Security Agent, an expert in platform security. You monitor alerts, analyze compliance, manage firewall rules, review audit logs, and enforce access control policies. Always prioritize security best practices in your recommendations.",
     },
     "database": {

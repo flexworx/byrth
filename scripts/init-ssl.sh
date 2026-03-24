@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# Byrth Platform — Initial SSL certificate provisioning via Let's Encrypt
+# Roosk Platform — Initial SSL certificate provisioning via Let's Encrypt
 # Usage: ./scripts/init-ssl.sh [email] [domain]
 #
 # Prerequisites: docker compose must be running (nginx + certbot services)
 
 set -euo pipefail
 
-EMAIL="${1:-admin@byrth.net}"
-DOMAIN="${2:-byrth.net}"
+EMAIL="${1:-admin@roosk.ai}"
+DOMAIN="${2:-roosk.ai}"
 
-echo "=== Byrth SSL Init ==="
+echo "=== Roosk SSL Init ==="
 echo "Domain: ${DOMAIN}"
 echo "Email:  ${EMAIL}"
 echo ""

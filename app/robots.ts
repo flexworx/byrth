@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/dashboard/', '/api/'],
       },
     ],
-    sitemap: 'https://byrth.net/sitemap.xml',
+    sitemap: 'https://roosk.ai/sitemap.xml',
   }
 }

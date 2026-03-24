@@ -185,7 +185,7 @@ async def mfa_setup(
     totp = pyotp.TOTP(secret)
     provisioning_uri = totp.provisioning_uri(
         name=user.email,
-        issuer_name="Byrth NexGen Platform",
+        issuer_name="Roosk NexGen Platform",
     )
 
     return MFASetupResponse(

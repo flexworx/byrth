@@ -30,6 +30,19 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+@layer utilities {
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
 
@@ -127,4 +140,15 @@
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-nexgen-accent to-nexgen-blue;
   }
+}
+
+/* Framer Motion SSR fix: prevent content from being invisible before JS hydrates.
+   Framer Motion sets inline style="opacity:0" on SSR, which hides content until
+   JavaScript runs the animation. This override makes content visible immediately,
+   then Framer Motion takes over once hydrated. */
+[style*="opacity:0"] {
+  opacity: 1 !important;
+}
+[style*="opacity: 0"] {
+  opacity: 1 !important;
 }

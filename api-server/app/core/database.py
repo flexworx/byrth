@@ -4,7 +4,7 @@ import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import select
+from sqlalchemy import select, text
 
 from app.core.config import get_settings
 
@@ -39,8 +39,14 @@ async def get_db() -> AsyncSession:
 
 async def init_db():
     """Create all tables and seed default admin user if no users exist."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+    except Exception as e:
+        if "already exists" in str(e):
+            logger.info("Tables/types already exist, skipping create_all")
+        else:
+            raise
 
     # Seed default admin user
     from app.models.models import User, MurphAgent

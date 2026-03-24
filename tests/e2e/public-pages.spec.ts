@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test.describe('Public Pages', () => {
   test('homepage loads with hero section', async ({ page }) => {
     await page.goto('/')
-    await expect(page).toHaveTitle(/Byrth/)
+    await expect(page).toHaveTitle(/Roosk/)
     await expect(page.locator('text=Network Intelligence')).toBeVisible()
   })
 

@@ -7,7 +7,7 @@ import { CTASection } from '@/components/home/CTASection'
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'Byrth was founded on a simple premise: infrastructure management should be intelligent, autonomous, and secure by default.',
+    'Roosk was founded on a simple premise: infrastructure management should be intelligent, autonomous, and secure by default.',
 }
 
 export default function AboutPage() {

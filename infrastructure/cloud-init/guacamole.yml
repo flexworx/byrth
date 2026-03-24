@@ -1,5 +1,5 @@
 #cloud-config
-# Apache Guacamole Gateway — Byrth NexGen Platform
+# Apache Guacamole Gateway — Roosk NexGen Platform
 # Web-based remote desktop gateway (RDP/VNC/SSH through browser)
 
 hostname: guacamole

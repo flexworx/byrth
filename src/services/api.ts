@@ -1,23 +1,66 @@
 const BASE_URL = '/api'
+const REQUEST_TIMEOUT = 30_000 // 30s default
+const MAX_RETRIES = 2
+const RETRY_DELAY = 1_000 // 1s
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
+// Connection state — components can subscribe to this
+type ConnectionState = 'connected' | 'disconnected' | 'reconnecting'
+type Listener = (state: ConnectionState) => void
+let connectionState: ConnectionState = 'connected'
+const listeners = new Set<Listener>()
+
+export function getConnectionState() { return connectionState }
+export function onConnectionChange(fn: Listener) { listeners.add(fn); return () => { listeners.delete(fn) } }
+function setConnectionState(state: ConnectionState) {
+  if (connectionState !== state) { connectionState = state; listeners.forEach((fn) => fn(state)) }
+}
+
+async function request<T>(path: string, options?: RequestInit & { retries?: number; timeout?: number }): Promise<T> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('nexgen_token') : null
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers: { ...headers, ...options?.headers },
-  })
+  const maxRetries = options?.retries ?? MAX_RETRIES
+  const timeout = options?.timeout ?? REQUEST_TIMEOUT
+  let lastError: Error | null = null
 
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ detail: res.statusText }))
-    throw new Error(error.detail || `API Error: ${res.status}`)
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), timeout)
+
+      const res = await fetch(`${BASE_URL}${path}`, {
+        ...options,
+        headers: { ...headers, ...options?.headers },
+        signal: controller.signal,
+      })
+      clearTimeout(timer)
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ detail: res.statusText }))
+        throw new Error(error.detail || `API Error: ${res.status}`)
+      }
+
+      setConnectionState('connected')
+      return res.json()
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err))
+      const isNetwork = lastError.name === 'AbortError' || lastError.message.includes('fetch')
+
+      if (isNetwork && attempt < maxRetries) {
+        setConnectionState('reconnecting')
+        await new Promise((r) => setTimeout(r, RETRY_DELAY * (attempt + 1)))
+        continue
+      }
+
+      if (isNetwork) setConnectionState('disconnected')
+      throw lastError
+    }
   }
 
-  return res.json()
+  throw lastError!
 }
 
 // Health

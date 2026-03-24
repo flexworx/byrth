@@ -40,7 +40,7 @@ export function PlatformOverview() {
       <div className="section-container">
         <MotionDiv className="text-center mb-16">
           <span className="text-xs font-mono text-nexgen-accent uppercase tracking-[0.2em] mb-4 block">
-            Why Byrth
+            Why Roosk
           </span>
           <h2 className="heading-lg mb-4">
             Not another MSP.
@@ -48,7 +48,7 @@ export function PlatformOverview() {
             <span className="gradient-text">An intelligence platform.</span>
           </h2>
           <p className="body-md max-w-2xl mx-auto">
-            Legacy managed service providers react to tickets. Byrth operates
+            Legacy managed service providers react to tickets. Roosk operates
             autonomously — predicting, preventing, and resolving infrastructure
             issues before your team even notices.
           </p>

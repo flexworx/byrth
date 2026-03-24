@@ -6,7 +6,7 @@
 set -euo pipefail
 
 echo "=== NexGen Gitea Installation ==="
-echo "Target: VM-GIT-01 (10.20.0.13)"
+echo "Target: VM-GIT-01 (10.20.0.30)"
 
 GITEA_VERSION="1.22.6"
 GITEA_USER="git"
@@ -166,7 +166,7 @@ nginx -t && systemctl reload nginx
 echo ""
 echo "=== Gitea Installation Complete ==="
 echo ""
-echo "Access: http://10.20.0.13:3000 (or https://git.nexgen.local after TLS)"
+echo "Access: http://10.20.0.30:3000 (or https://git.nexgen.local after TLS)"
 echo ""
 echo "Create admin user:"
 echo "  sudo -u git gitea admin user create \\"
@@ -176,7 +176,7 @@ echo "    --email admin@flexworx.io \\"
 echo "    --admin \\"
 echo "    --config /var/lib/gitea/custom/conf/app.ini"
 echo ""
-echo "Then push the Byrth repo:"
-echo "  git remote add origin http://10.20.0.13:3000/admin/byrth.git"
+echo "Then push the Roosk repo:"
+echo "  git remote add origin http://10.20.0.30:3000/admin/roosk.git"
 echo "  git push -u origin main"
 echo ""

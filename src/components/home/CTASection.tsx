@@ -24,7 +24,7 @@ export function CTASection() {
             with <span className="gradient-text">autonomous intelligence?</span>
           </h2>
           <p className="body-lg mb-10 max-w-xl mx-auto">
-            See how Byrth transforms infrastructure management from ticket-driven
+            See how Roosk transforms infrastructure management from ticket-driven
             firefighting into AI-driven operational excellence.
           </p>
 

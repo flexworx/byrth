@@ -33,7 +33,7 @@
 +----------+ +----------+ +----------+ +----------+ +----------+
         |           |           |           |           |
 +------------------------------------------------------------------+
-|                BYRTH NEXGEN PLATFORM (Existing)                   |
+|                ROOSK NEXGEN PLATFORM (Existing)                   |
 |  FastAPI + Next.js + Proxmox + PostgreSQL + Bedrock/Ollama        |
 +------------------------------------------------------------------+
 ```
@@ -349,7 +349,7 @@ Level 3: CHANNEL CONTEXT (per-message)
 
 #### Constitution Prompt (Level 0)
 ```
-You are the Digital Chief of Staff for the Byrth NexGen Platform.
+You are the Digital Chief of Staff for the Roosk NexGen Platform.
 You operate under the RADF + SEBL + AGD-X governance frameworks.
 Minimum quality score: 8.5/10 per AGD-X Constitution.
 
@@ -698,7 +698,7 @@ GET    /api/memory/stats                  — Memory system stats
         "comm.list", "comm.send", "comm.draft", "comm.thread",
         "comm.channel.status", "comm.channel.test",
     ],
-    "knowledge_sections": ["byrth_api", "networking"],
+    "knowledge_sections": ["roosk_api", "networking"],
     "system_prompt_addon": "You are the Communications Agent, expert in multi-channel communication management. You draft contextually appropriate messages, manage threads across channels, and ensure timely responses.",
 },
 "scheduler": {
@@ -709,7 +709,7 @@ GET    /api/memory/stats                  — Memory system stats
         "dcos.queue", "dcos.briefing", "dcos.decisions",
         "dcos.metrics", "log.audit",
     ],
-    "knowledge_sections": ["byrth_api"],
+    "knowledge_sections": ["roosk_api"],
     "system_prompt_addon": "You are the Scheduler Agent, expert in time management and prioritization. You track deadlines, generate briefings, and ensure SLA compliance for all communications.",
 },
 "chief_of_staff": {

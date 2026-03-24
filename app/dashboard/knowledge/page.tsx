@@ -16,7 +16,7 @@ interface KBArticle {
 
 const articles: KBArticle[] = [
   {
-    id: '1', title: 'Getting Started with Byrth Platform', category: 'General',
+    id: '1', title: 'Getting Started with Roosk Platform', category: 'General',
     excerpt: 'Overview of platform architecture, initial setup, and first steps for administrators.',
     tags: ['setup', 'admin', 'quickstart'], updated: '2026-03-09',
     content: `## Quick Start Guide
@@ -32,7 +32,7 @@ const articles: KBArticle[] = [
 1. **Clone the repository**
    \`\`\`bash
    git clone https://github.com/flexworx/byrth.git
-   cd byrth
+   cd roosk
    \`\`\`
 
 2. **Configure environment**
@@ -130,7 +130,7 @@ Pre-built service templates available:
 | VLAN ID | Name | Subnet | Purpose |
 |---------|------|--------|---------|
 | 10 | Management | 10.0.10.0/24 | Proxmox, IPMI, management interfaces |
-| 20 | Control Plane | 10.0.20.0/24 | Byrth platform, API servers, databases |
+| 20 | Control Plane | 10.0.20.0/24 | Roosk platform, API servers, databases |
 | 30 | Tenant | 10.0.30.0/24 | Customer/user VMs, DaaS desktops |
 | 40 | DMZ | 10.0.40.0/24 | Public-facing services, web servers |
 | 50 | Storage | 10.0.50.0/24 | ZFS replication, backup traffic |
@@ -230,7 +230,7 @@ The platform maps to NIST families: AC (Access Control), AU (Audit), CA (Assessm
 | pg_dump | Daily 02:00 | 30 days | /backups/pg/ |
 | WAL Archive | Continuous | 7 days | /backups/wal/ |
 | ZFS Snapshot | Every 6h | 7 days | ZFS pool |
-| S3 Upload | Daily 04:00 | 90 days | s3://byrth-backups/ |
+| S3 Upload | Daily 04:00 | 90 days | s3://roosk-backups/ |
 
 ### Recovery Procedures
 
@@ -239,7 +239,7 @@ The platform maps to NIST families: AC (Access Control), AU (Audit), CA (Assessm
 # Stop services
 docker compose stop backend frontend
 # Restore from pg_dump
-docker compose exec postgres pg_restore -d byrth /backups/pg/latest.dump
+docker compose exec postgres pg_restore -d roosk /backups/pg/latest.dump
 # Restart services
 docker compose start backend frontend
 \`\`\`
@@ -247,7 +247,7 @@ docker compose start backend frontend
 **Point-in-Time Recovery**
 \`\`\`bash
 # Specify target timestamp
-docker compose exec postgres pg_restore --target-time="2026-03-08 14:30:00" -d byrth
+docker compose exec postgres pg_restore --target-time="2026-03-08 14:30:00" -d roosk
 \`\`\`
 
 **ZFS Snapshot Rollback**
@@ -297,7 +297,7 @@ BEDROCK_COMPLEX_MODEL_ID=us.anthropic.claude-opus-4-20250514-v1:0
 2. Frontend sends to \`POST /api/llm/complete\`
 3. Backend injects live platform state (VM list, CPU, RAM, alerts)
 4. Request routed to Bedrock with action-aware system prompt
-5. If LLM includes \`byrth_action\` block, action is parsed and executed
+5. If LLM includes \`roosk_action\` block, action is parsed and executed
 6. Action result returned alongside LLM explanation
 7. All requests logged for cost tracking and audit
 
@@ -432,10 +432,10 @@ Authorization: Bearer eyJ...
 # Create key (admin only)
 POST /api/auth/api-keys
 Body: {"name": "ci-pipeline", "scopes": ["vms:read", "vms:write"]}
-Response: {"key": "byrth_sk_...", "id": "uuid"}
+Response: {"key": "roosk_sk_...", "id": "uuid"}
 
 # Use key
-X-API-Key: byrth_sk_...
+X-API-Key: roosk_sk_...
 \`\`\`
 
 ### Available Scopes
@@ -483,51 +483,51 @@ X-API-Key: byrth_sk_...
 - **Prometheus** (port 9090) — Metric collection and alerting rules
 - **Grafana** (port 3001) — Dashboards and visualization
 - **Node Exporter** — Hardware and OS metrics from Proxmox host
-- **Byrth Exporter** — Custom metrics from FastAPI backend
+- **Roosk Exporter** — Custom metrics from FastAPI backend
 
 ### Key Metrics
 | Metric | Type | Description |
 |--------|------|-------------|
-| byrth_vms_total | Gauge | Total VMs by status |
-| byrth_cpu_usage_percent | Gauge | Overall CPU utilization |
-| byrth_ram_usage_bytes | Gauge | RAM usage |
-| byrth_storage_used_bytes | Gauge | Storage consumption |
-| byrth_api_requests_total | Counter | API request count by endpoint |
-| byrth_api_latency_seconds | Histogram | API response times |
-| byrth_llm_requests_total | Counter | LLM proxy requests |
-| byrth_llm_cost_usd | Counter | Estimated Bedrock spend |
-| byrth_security_alerts_active | Gauge | Unresolved security alerts |
-| byrth_backup_age_seconds | Gauge | Time since last backup |
+| roosk_vms_total | Gauge | Total VMs by status |
+| roosk_cpu_usage_percent | Gauge | Overall CPU utilization |
+| roosk_ram_usage_bytes | Gauge | RAM usage |
+| roosk_storage_used_bytes | Gauge | Storage consumption |
+| roosk_api_requests_total | Counter | API request count by endpoint |
+| roosk_api_latency_seconds | Histogram | API response times |
+| roosk_llm_requests_total | Counter | LLM proxy requests |
+| roosk_llm_cost_usd | Counter | Estimated Bedrock spend |
+| roosk_security_alerts_active | Gauge | Unresolved security alerts |
+| roosk_backup_age_seconds | Gauge | Time since last backup |
 
 ### Alert Rules
 \`\`\`yaml
 groups:
-  - name: byrth
+  - name: roosk
     rules:
       - alert: HighCPU
-        expr: byrth_cpu_usage_percent > 85
+        expr: roosk_cpu_usage_percent > 85
         for: 5m
         labels: { severity: warning }
       - alert: CriticalCPU
-        expr: byrth_cpu_usage_percent > 95
+        expr: roosk_cpu_usage_percent > 95
         for: 2m
         labels: { severity: critical }
       - alert: LowDiskSpace
-        expr: (byrth_storage_used_bytes / byrth_storage_total_bytes) > 0.85
+        expr: (roosk_storage_used_bytes / roosk_storage_total_bytes) > 0.85
         for: 10m
         labels: { severity: warning }
       - alert: BackupStale
-        expr: byrth_backup_age_seconds > 93600
+        expr: roosk_backup_age_seconds > 93600
         for: 1m
         labels: { severity: critical }
       - alert: VMDown
-        expr: byrth_vm_status{status="stopped"} == 1
+        expr: roosk_vm_status{status="stopped"} == 1
         for: 5m
         labels: { severity: warning }
 \`\`\`
 
 ### WebSocket Notifications
-All Prometheus alerts are forwarded to the Byrth WebSocket notification system:
+All Prometheus alerts are forwarded to the Roosk WebSocket notification system:
 1. Alertmanager sends webhook to \`/api/webhooks/alertmanager\`
 2. Backend publishes to WebSocket channel
 3. DashboardHeader bell icon shows real-time count
@@ -535,7 +535,7 @@ All Prometheus alerts are forwarded to the Byrth WebSocket notification system:
   },
   {
     id: '11', title: 'Docker Compose Deployment Guide', category: 'Infrastructure',
-    excerpt: 'Complete guide to deploying Byrth via Docker Compose with SSL, monitoring, and auto-restart.',
+    excerpt: 'Complete guide to deploying Roosk via Docker Compose with SSL, monitoring, and auto-restart.',
     tags: ['docker', 'deployment', 'nginx', 'ssl'], updated: '2026-03-09',
     content: `## Docker Deployment
 
@@ -543,8 +543,8 @@ All Prometheus alerts are forwarded to the Byrth WebSocket notification system:
 | Service | Image | Ports | Purpose |
 |---------|-------|-------|---------|
 | postgres | postgres:16-alpine | 5432 (internal) | Primary database |
-| backend | byrth-backend | 8000 (internal) | FastAPI API server |
-| frontend | byrth-frontend | 3000 (internal) | Next.js web UI |
+| backend | roosk-backend | 8000 (internal) | FastAPI API server |
+| frontend | roosk-frontend | 3000 (internal) | Next.js web UI |
 | nginx | nginx:alpine | 80, 443 | Reverse proxy, SSL |
 | certbot | certbot | — | SSL certificate renewal |
 | prometheus | prom/prometheus | 9090 | Metrics collection |
@@ -554,7 +554,7 @@ All Prometheus alerts are forwarded to the Byrth WebSocket notification system:
 See \`.env.example\` for complete list. Critical settings:
 \`\`\`bash
 # Database
-DATABASE_URL=postgresql+asyncpg://byrth:password@postgres:5432/byrth
+DATABASE_URL=postgresql+asyncpg://roosk:password@postgres:5432/roosk
 
 # Security
 JWT_SECRET_KEY=<openssl rand -hex 32>
@@ -563,7 +563,7 @@ JWT_ALGORITHM=HS256
 # Proxmox
 PROXMOX_HOST=10.0.10.1
 PROXMOX_USER=root@pam
-PROXMOX_TOKEN_ID=byrth
+PROXMOX_TOKEN_ID=roosk
 PROXMOX_TOKEN_SECRET=<token>
 
 # AWS Bedrock
@@ -572,7 +572,7 @@ AWS_SECRET_ACCESS_KEY=<secret>
 AWS_DEFAULT_REGION=us-east-1
 
 # Domain
-DOMAIN=byrth.yourdomain.com
+DOMAIN=roosk.yourdomain.com
 \`\`\`
 
 ### Commands
@@ -654,7 +654,7 @@ Select a specialized agent for domain-specific expertise:
   },
   {
     id: '13', title: 'Cato 1600 SASE Configuration', category: 'Networking',
-    excerpt: 'Managing your Cato 1600 device: SD-WAN, firewall, ZTNA, and integration with Byrth.',
+    excerpt: 'Managing your Cato 1600 device: SD-WAN, firewall, ZTNA, and integration with Roosk.',
     tags: ['cato', 'sase', 'firewall', 'ztna', 'sdwan'], updated: '2026-03-09',
     content: `## Cato 1600 SASE Device
 
@@ -667,8 +667,8 @@ The Cato 1600 is a SASE (Secure Access Service Edge) appliance that provides:
 - Secure Web Gateway (SWG)
 - Cloud Access Security Broker (CASB)
 
-### Integration with Byrth
-The Byrth platform monitors the Cato device via its API:
+### Integration with Roosk
+The Roosk platform monitors the Cato device via its API:
 - **Dashboard > Networks**: Shows VLAN topology routed through Cato
 - **Security Center**: Displays IPS alerts forwarded from Cato
 - **AI Console**: "Show Cato firewall status" queries the Cato API
@@ -856,9 +856,9 @@ This installs:
 
 ### Git Workflow
 \`\`\`bash
-# Clone the Byrth repo on the server
+# Clone the Roosk repo on the server
 git clone https://github.com/flexworx/byrth.git
-cd byrth
+cd roosk
 
 # Create feature branch
 git checkout -b feature/my-feature
